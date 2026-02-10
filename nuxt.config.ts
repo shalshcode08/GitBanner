@@ -1,5 +1,19 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
-  devtools: { enabled: true }
-})
+  future: {
+    compatibilityVersion: 4,
+  },
+  compatibilityDate: "2025-07-15",
+  devtools: { enabled: true },
+  devServer: {
+    port: 4000,
+    host: "localhost",
+  },
+  routeRules: {
+    "/**": { isr: true },
+  },
+  vite: {
+    plugins: [tailwindcss()],
+  },
+  css: ["@/assets/css/index.css"],
+});
