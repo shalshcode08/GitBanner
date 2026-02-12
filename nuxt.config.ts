@@ -15,5 +15,10 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  css: ["@/assets/css/index.css"],
+  css: ["~/assets/css/tailwind.css"],
+  modules: ["shadcn-nuxt"],
+  shadcn: {
+    prefix: "",
+    componentDir: "@/components/ui",
+  },
 });
