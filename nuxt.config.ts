@@ -21,9 +21,9 @@ export default defineNuxtConfig({
     prefix: "",
     componentDir: "@/components/ui",
   },
-  colorMode: {
-    classSuffix: "",
-    preference: "system",
-    fallback: "light",
-  },
+ colorMode: {
+  classSuffix: "",
+  preference: "light",
+  fallback: "light",
+}
 });

@@ -1,5 +1,7 @@
 <template>
     <NuxtLayout>
-        <NuxtPage />
+        <ColorScheme>
+            <NuxtPage />
+        </ColorScheme>
     </NuxtLayout>
 </template>
