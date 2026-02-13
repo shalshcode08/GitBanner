@@ -22,7 +22,7 @@ const toggleTheme = () => {
 <template>
   <button @click="toggleTheme"
     class="flex items-center justify-center w-9 h-9 rounded-md bg-background hover:bg-accent transition-colors">
-    <HugeiconsIcon v-if="isDark" :icon="Sun01Icon" class="w-4 h-4" />
-    <HugeiconsIcon v-else :icon="Moon02Icon" class="w-4 h-4" />
+    <HugeiconsIcon v-if="isDark" :icon="Sun01Icon" class="w-6 h-6" />
+    <HugeiconsIcon v-else :icon="Moon02Icon" class="w-6 h-6" />
   </button>
 </template>

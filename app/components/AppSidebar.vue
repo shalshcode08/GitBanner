@@ -13,18 +13,16 @@ import {
 </script>
 
 <template>
-    <Sidebar>
+    <Sidebar variant="inset">
         <SidebarHeader class="h-16 w-full flex items-center justify-center p-0"
-            >header</SidebarHeader
+            ></SidebarHeader
         >
-
         <SidebarContent>
             <SidebarGroup>
-                <SidebarGroupLabel>option</SidebarGroupLabel>
-
+                <!-- <SidebarGroupLabel>option</SidebarGroupLabel> -->
                 <SidebarGroupContent>
                     <SidebarMenu>
-                        <SidebarMenuItem>
+                        <!-- <SidebarMenuItem>
                             <SidebarMenuButton as-child>
                                 <p>onw</p>
                             </SidebarMenuButton>
@@ -34,7 +32,7 @@ import {
                             <SidebarMenuButton as-child>
                                 <p>two</p>
                             </SidebarMenuButton>
-                        </SidebarMenuItem>
+                        </SidebarMenuItem> -->
                     </SidebarMenu>
                 </SidebarGroupContent>
             </SidebarGroup>
