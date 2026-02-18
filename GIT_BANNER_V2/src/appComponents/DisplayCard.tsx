@@ -1,15 +1,18 @@
 import { Plus } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { cn } from "../lib/utils";
+import { useNavigate } from "react-router";
 
 interface Props {
   title: string;
   description: string;
   image: string;
-  link?: string;
+  link: string;
 }
 
-const DisplayCard = ({ title, description, image }: Props) => {
+const DisplayCard = ({ title, description, image, link }: Props) => {
+  const navigate = useNavigate();
+
   return (
     <div className="w-full overflow-hidden border rounded-md bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow">
       <div className="relative flex h-48 w-full items-center justify-center overflow-hidden bg-white dark:bg-black">
@@ -31,7 +34,7 @@ const DisplayCard = ({ title, description, image }: Props) => {
         )}
       </div>
 
-      <div className="flex items-center justify-between p-4 gap-4">
+      <div className="flex items-center justify-between p-4 gap-4 border-t">
         <div className="flex flex-col min-w-0 gap-1">
           <h3 className="text-sm font-bold truncate">{title}</h3>
           <p className="text-xs text-muted-foreground truncate">
