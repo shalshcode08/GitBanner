@@ -38,6 +38,7 @@ const AppDashboard = ({ openDialoge, setOpenDialoge }: Props) => {
   return (
     <>
       <HeaderSection />
+      {/*TODO: remove default open={ false } to correct {openDialoge}*/}
       <UserNameInputModal open={false} setOpen={setOpenDialoge} />
     </>
   );
