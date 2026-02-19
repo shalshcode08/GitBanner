@@ -6,7 +6,7 @@ const DashBoardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="w-full">{children}</main>
+      <main className="w-full py-4">{children}</main>
     </SidebarProvider>
   );
 };

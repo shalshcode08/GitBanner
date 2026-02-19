@@ -9,7 +9,7 @@ const HeaderSection = () => {
   const { toggleSidebar } = useSidebar();
 
   return (
-    <div className="p-2 px-4 flex items-center gap-4 justify-between w-full">
+    <div className="px-4 flex items-center gap-4 justify-between w-full">
       <div>
         <CreateBtn onClick={toggleSidebar}>
           <SidebarIcon size={17} />
@@ -38,7 +38,7 @@ const AppDashboard = ({ openDialoge, setOpenDialoge }: Props) => {
   return (
     <>
       <HeaderSection />
-      <UserNameInputModal open={openDialoge} setOpen={setOpenDialoge} />
+      <UserNameInputModal open={false} setOpen={setOpenDialoge} />
     </>
   );
 };

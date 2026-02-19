@@ -1,6 +1,14 @@
 import { createIcon } from "../../utils/createIcon";
 
-export const AppLogo = ({ fillColor }: { fillColor: string }) => {
+export const AppLogo = ({
+  fillColor,
+  height,
+  width,
+}: {
+  fillColor: string;
+  height?: number;
+  width?: number;
+}) => {
   return createIcon(
     <>
       <path
@@ -58,6 +66,11 @@ export const AppLogo = ({ fillColor }: { fillColor: string }) => {
         transform="translate(720,952)"
       />
     </>,
-    { width: 120, height: 50, fill: "none", viewBox: "450 900 1200 250" },
+    {
+      width: width || 120,
+      height: height || 50,
+      fill: "none",
+      viewBox: "450 900 1200 250",
+    },
   );
 };
