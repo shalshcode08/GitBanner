@@ -11,6 +11,8 @@ import { Input } from "../components/ui/input";
 import { useNavigate } from "react-router";
 import { AppRoutes } from "../routes";
 import { LightbulbIcon } from "lucide-react";
+import { storage } from "../utils/localStorage";
+import { APP_USERNAME_KEY } from "../utils/constants";
 
 interface Props {
   open: boolean;
@@ -19,7 +21,7 @@ interface Props {
 
 const UserNameInputModal = ({ open, setOpen }: Props) => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState<string>("");
 
   const handleCancleBtnClick = () => {
     setOpen(false);
@@ -29,6 +31,7 @@ const UserNameInputModal = ({ open, setOpen }: Props) => {
   const handleSubmit = () => {
     if (username.trim()) {
       // TODO: Handle username submission (e.g., save to context or fetch data)
+      storage.set(APP_USERNAME_KEY, username);
       console.log("Username:", username);
       setOpen(false);
     }

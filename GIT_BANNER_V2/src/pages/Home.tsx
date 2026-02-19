@@ -8,8 +8,8 @@ const Home = () => {
   const { theme } = useTheme();
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-center py-10">
-      <div className="w-full max-w-3xl flex flex-col gap-8">
+    <div className="w-full min-h-screen flex flex-col items-center justify-center py-4 sm:py-8">
+      <div className="w-full max-w-3xl flex flex-col gap-8 px-4">
         <div className="w-full flex justify-center">
           <HomepageHeader />
         </div>

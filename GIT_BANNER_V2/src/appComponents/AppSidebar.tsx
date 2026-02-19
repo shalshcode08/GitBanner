@@ -17,7 +17,7 @@ const AppSidebar = () => {
 
   return (
     <Sidebar variant="floating" side="left" className="py-2 pl-4">
-      <div className="flex flex-row items-center gap-6 px-2.5 py-2">
+      <div className="flex flex-row items-center gap-4 px-2.5 py-2">
         <CreateBtn
           onClick={() => {
             navigate(AppRoutes.Home);
@@ -25,10 +25,12 @@ const AppSidebar = () => {
         >
           <ArrowLeft size={17} />
         </CreateBtn>
-        <AppLogo
-          fillColor={theme === "dark" ? "#ffffff" : "#232323"}
-          height={40}
-        />
+        <div className="mt-[6px]">
+          <AppLogo
+            fillColor={theme === "dark" ? "#ffffff" : "#232323"}
+            height={40}
+          />
+        </div>
       </div>
       <SidebarContent>
         <SidebarGroup />
