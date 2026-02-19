@@ -10,6 +10,7 @@ import { useNavigate } from "react-router";
 import { AppRoutes } from "../routes";
 import { AppLogo } from "../icons/HeaderIcons";
 import { useTheme } from "../context/ThemeProvider";
+import { Link } from "react-router";
 
 const AppSidebar = () => {
   const navigate = useNavigate();
@@ -25,12 +26,12 @@ const AppSidebar = () => {
         >
           <ArrowLeft size={17} />
         </CreateBtn>
-        <div className="mt-[6px]">
+        <Link to={AppRoutes.Home} className="mt-[6px]">
           <AppLogo
             fillColor={theme === "dark" ? "#ffffff" : "#232323"}
             height={40}
           />
-        </div>
+        </Link>
       </div>
       <SidebarContent>
         <SidebarGroup />
