@@ -1,6 +1,7 @@
 import DashBoardLayout from "../layout/DashBoardLayout";
 import AppDashboard from "../appComponents/AppDashboard";
 import { useEffect, useState } from "react";
+import { DashboardProvider } from "../context/DashboardContext";
 
 const DashBoard = () => {
   const [openDialoge, setOpenDialoge] = useState<boolean>(false);
@@ -9,9 +10,14 @@ const DashBoard = () => {
   }, []);
 
   return (
-    <DashBoardLayout>
-      <AppDashboard openDialoge={openDialoge} setOpenDialoge={setOpenDialoge} />
-    </DashBoardLayout>
+    <DashboardProvider>
+      <DashBoardLayout>
+        <AppDashboard
+          openDialoge={openDialoge}
+          setOpenDialoge={setOpenDialoge}
+        />
+      </DashBoardLayout>
+    </DashboardProvider>
   );
 };
 
