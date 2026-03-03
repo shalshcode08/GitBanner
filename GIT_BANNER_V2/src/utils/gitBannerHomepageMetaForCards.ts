@@ -6,8 +6,8 @@ export const GitBannerHomepageMetaForCards: Record<CardsType, CardMeta> = {
     title: "Github Contributions",
     description: "Generate a banner showcasing your GitHub contributions.",
     image: {
-      light: "/assets/cards-banner-img/contributions/contribution_light.png",
-      dark: "/assets/cards-banner-img/contributions/contribution_dark.png",
+      light: "/assets/cards-banner-img/contributions/contribution_light.svg",
+      dark: "/assets/cards-banner-img/contributions/contribution_dark.svg",
     },
     link: `${AppRoutes.Dashboard}?type=${CardsType.GIT_CONTRIBUTION_CARD}`,
   },
@@ -16,8 +16,8 @@ export const GitBannerHomepageMetaForCards: Record<CardsType, CardMeta> = {
     description:
       "Generate a banner showcasing your pinned repositories on GitHub.",
     image: {
-      light: "/assets/cards-banner-img/pinned-repos/pinned_light.png",
-      dark: "/assets/cards-banner-img/pinned-repos/pinned_dark.png",
+      light: "/assets/cards-banner-img/pinned-repos/pinned_light.svg",
+      dark: "/assets/cards-banner-img/pinned-repos/pinned_dark.svg",
     },
     link: `${AppRoutes.Dashboard}?type=${CardsType.GIT_PINNED_REPOS_CARD}`,
   },
@@ -25,8 +25,8 @@ export const GitBannerHomepageMetaForCards: Record<CardsType, CardMeta> = {
     title: "Github Stats",
     description: "Generate a banner showcasing your GitHub stats.",
     image: {
-      light: "/assets/cards-banner-img/stats/stats_light.png",
-      dark: "/assets/cards-banner-img/stats/stats_dark.png",
+      light: "/assets/cards-banner-img/stats/stats_light.svg",
+      dark: "/assets/cards-banner-img/stats/stats_dark.svg",
     },
     link: `${AppRoutes.Dashboard}?type=${CardsType.GIT_STATS_CARD}`,
   },

@@ -25,14 +25,13 @@ const DisplayCard = ({ title, description, image, link }: Props) => {
           )}
         />
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-black"></div>
-        {/*TODO: uncomment it*/}
-        {/*{image && (
+        {image && (
           <img
             src={image}
             alt={title || "card-banner-img"}
-            className="relative z-20 h-full w-[84%] object-contain"
+            className="relative z-20 h-[96%] w-[84%] object-contain"
           />
-        )}*/}
+        )}
       </div>
 
       <div className="flex items-center justify-between p-4 gap-4 border-t">
