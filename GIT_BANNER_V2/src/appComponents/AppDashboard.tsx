@@ -4,6 +4,7 @@ import {
   Download,
   Github,
   LoaderCircle,
+  Pencil,
   SidebarIcon,
   TriangleAlert,
 } from "lucide-react";
@@ -131,9 +132,10 @@ function useSvgBanner(
 interface HeaderProps {
   processedSvg: string | null;
   params: BannerParams | null;
+  onChangeUsername: () => void;
 }
 
-const HeaderSection = ({ processedSvg, params }: HeaderProps) => {
+const HeaderSection = ({ processedSvg, params, onChangeUsername }: HeaderProps) => {
   const { toggleSidebar } = useSidebar();
   const isMobile = useIsMobile();
   const { username } = useDashboard();
@@ -143,17 +145,43 @@ const HeaderSection = ({ processedSvg, params }: HeaderProps) => {
     if (!processedSvg || !params || isDownloading) return;
 
     setIsDownloading(true);
-    try {
-      const blob = new Blob([processedSvg], { type: "image/svg+xml" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${params.username}-${params.type}-${params.format}.svg`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } finally {
+
+    const svgBlob = new Blob([processedSvg], { type: "image/svg+xml" });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    const img = new Image();
+
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth || 1500;
+      canvas.height = img.naturalHeight || 500;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        URL.revokeObjectURL(svgUrl);
+        setIsDownloading(false);
+        return;
+      }
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(svgUrl);
+
+      canvas.toBlob((pngBlob) => {
+        if (pngBlob) {
+          const url = URL.createObjectURL(pngBlob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${params.username}-${params.type}-${params.format}.png`;
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+        setIsDownloading(false);
+      }, "image/png");
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(svgUrl);
       setIsDownloading(false);
-    }
+    };
+
+    img.src = svgUrl;
   }, [processedSvg, params, isDownloading]);
 
   return (
@@ -172,6 +200,17 @@ const HeaderSection = ({ processedSvg, params }: HeaderProps) => {
                 <p>{username}</p>
               </TooltipTrigger>
               <TooltipContent>{username}</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={onChangeUsername}
+                  className="shrink-0 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                >
+                  <Pencil size={13} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Change username</TooltipContent>
             </Tooltip>
           </div>
         )}
@@ -281,7 +320,11 @@ const AppDashboard = ({ openDialoge, setOpenDialoge }: Props) => {
 
   return (
     <div className="flex flex-col h-full w-full">
-      <HeaderSection processedSvg={processedSvg} params={params} />
+      <HeaderSection
+        processedSvg={processedSvg}
+        params={params}
+        onChangeUsername={() => setOpenDialoge(true)}
+      />
       <MainContentSection
         objectUrl={objectUrl}
         status={status}
