@@ -35,7 +35,7 @@ const UserNameInputModal = ({ open, setOpen }: Props) => {
   const handleCancel = () => {
     abortRef.current?.abort();
     setOpen(false);
-    navigate(AppRoutes.Home);
+    if (!savedUsername) navigate(AppRoutes.Home);
   };
 
   const handleSubmit = async () => {
