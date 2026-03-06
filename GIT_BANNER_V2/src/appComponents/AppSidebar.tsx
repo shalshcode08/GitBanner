@@ -227,7 +227,7 @@ const AppSidebar = () => {
 
             {/* Contribution Colors */}
             <SidebarGroup>
-              <SidebarGroupLabel>Contribution Colors</SidebarGroupLabel>
+              <SidebarGroupLabel>Color Palette</SidebarGroupLabel>
               <SidebarGroupContent>
                 <div className="flex flex-col gap-0.5 px-1 pt-1">
                   {COLOR_PALETTES.map((palette) => (
