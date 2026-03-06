@@ -7,9 +7,12 @@ import { AppRoutes } from "../routes";
 const HomepageHeader = () => {
   const { theme } = useTheme();
   return (
-    <div className="w-full max-w-3xl mx-auto flex items-center justify-between">
+    <div className="w-full flex items-center justify-between">
       <Link to={AppRoutes.Home}>
-        <AppLogo fillColor={theme === "dark" ? "#ffffff" : "#232323"} />
+        <AppLogo
+          fillColor={theme === "dark" ? "#e6edf3" : "#1f2328"}
+          height={36}
+        />
       </Link>
       <ThemeToggleBtn />
     </div>
