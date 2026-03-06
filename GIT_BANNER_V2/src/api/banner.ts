@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const BASE_URL = (
   (import.meta.env.VITE_API_BASE_URL as string | undefined) ??
   "https://git-banner-prod.up.railway.app"
@@ -64,18 +66,20 @@ export async function validateUsername(
       theme: "dark",
     });
 
-    const res = await fetch(url, { signal });
-
-    if (res.status === 400) return "Invalid GitHub username.";
-    if (res.status === 401) return "API authentication error. Try again later.";
-    if (res.status === 404) return `GitHub user "${username}" not found.`;
-    if (res.status === 429) return "Too many requests. Please wait a moment.";
-    if (!res.ok) return "Something went wrong. Please try again.";
+    await axios.get(url, { signal });
 
     return null;
   } catch (err) {
-    if (err instanceof Error && err.name === "AbortError") return null;
-    return "Network error. Check your connection.";
+    if (axios.isCancel(err)) return null;
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status;
+      if (status === 400) return "Invalid GitHub username.";
+      if (status === 401) return "API authentication error. Try again later.";
+      if (status === 404) return `GitHub user "${username}" not found.`;
+      if (status === 429) return "Too many requests. Please wait a moment.";
+      if (!err.response) return "Network error. Check your connection.";
+    }
+    return "Something went wrong. Please try again.";
   }
 }
 
@@ -88,10 +92,9 @@ export async function fetchBannerBlob(
   params: BannerParams,
   signal?: AbortSignal,
 ): Promise<Blob> {
-  const res = await fetch(getBannerUrl(params), { signal });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "Unknown error");
-    throw new BannerApiError(text.trim(), res.status);
-  }
-  return res.blob();
+  const res = await axios.get<Blob>(getBannerUrl(params), {
+    responseType: "blob",
+    signal,
+  });
+  return res.data;
 }

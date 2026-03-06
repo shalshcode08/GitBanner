@@ -22,16 +22,16 @@ Generate beautiful GitHub profile banners — contribution graphs, stats, and pi
 
 ## Tech Stack
 
-| Layer | Choice |
-|---|---|
-| Framework | React 19 + TypeScript |
-| Build | Vite 7 |
-| Styling | Tailwind CSS v4 |
-| UI primitives | shadcn/ui (Radix UI) |
-| Routing | React Router v7 |
-| Icons | Lucide React |
-| Testing | Vitest + React Testing Library |
-| Package manager | Bun |
+| Layer           | Choice                         |
+| --------------- | ------------------------------ |
+| Framework       | React 19 + TypeScript          |
+| Build           | Vite 7                         |
+| Styling         | Tailwind CSS v4                |
+| UI primitives   | shadcn/ui (Radix UI)           |
+| Routing         | React Router v7                |
+| Icons           | Lucide React                   |
+| Testing         | Vitest + React Testing Library |
+| Package manager | Bun                            |
 
 ---
 
@@ -53,8 +53,8 @@ bun install
 cp .env.example .env
 ```
 
-| Variable | Description | Default |
-|---|---|---|
+| Variable            | Description                        | Default                                  |
+| ------------------- | ---------------------------------- | ---------------------------------------- |
 | `VITE_API_BASE_URL` | Base URL of the git-banner backend | `https://git-banner-prod.up.railway.app` |
 
 ### Dev server
@@ -79,16 +79,16 @@ bun run preview
 
 ## Scripts
 
-| Script | Description |
-|---|---|
-| `bun run dev` | Start the Vite dev server |
-| `bun run build` | Type-check + production build |
-| `bun run preview` | Preview the production build locally |
-| `bun run lint` | Run ESLint |
-| `bun run format` | Format all files with Prettier |
-| `bun run test` | Run all Vitest tests once |
-| `bun run test:watch` | Run Vitest in watch mode |
-| `bun run test:coverage` | Generate V8 coverage report |
+| Script                  | Description                          |
+| ----------------------- | ------------------------------------ |
+| `bun run dev`           | Start the Vite dev server            |
+| `bun run build`         | Type-check + production build        |
+| `bun run preview`       | Preview the production build locally |
+| `bun run lint`          | Run ESLint                           |
+| `bun run format`        | Format all files with Prettier       |
+| `bun run test`          | Run all Vitest tests once            |
+| `bun run test:watch`    | Run Vitest in watch mode             |
+| `bun run test:coverage` | Generate V8 coverage report          |
 
 ---
 
@@ -133,11 +133,11 @@ bun run test
 
 87 tests across 6 suites:
 
-| Suite | Coverage |
-|---|---|
-| `api/banner` | URL builder, error class, validateUsername, fetchBannerBlob |
-| `utils/localStorage` | get/set/has/remove/clear/getRaw/setRaw + TTL expiry |
-| `utils/svgColors` | applyPaletteToContribSvg, applyPaletteToStatsSvg |
-| `hooks/useBanner` | URL derivation, card-type mapping |
-| `context/DashboardContext` | State management, localStorage persistence |
-| `appComponents/UserNameInputModal` | Form interactions, API validation, error display |
+| Suite                              | Coverage                                                    |
+| ---------------------------------- | ----------------------------------------------------------- |
+| `api/banner`                       | URL builder, error class, validateUsername, fetchBannerBlob |
+| `utils/localStorage`               | get/set/has/remove/clear/getRaw/setRaw + TTL expiry         |
+| `utils/svgColors`                  | applyPaletteToContribSvg, applyPaletteToStatsSvg            |
+| `hooks/useBanner`                  | URL derivation, card-type mapping                           |
+| `context/DashboardContext`         | State management, localStorage persistence                  |
+| `appComponents/UserNameInputModal` | Form interactions, API validation, error display            |

@@ -1,10 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import axios from "axios";
 import {
   getBannerUrl,
   BannerApiError,
   validateUsername,
   fetchBannerBlob,
 } from "../../api/banner";
+
+vi.mock("axios");
+const mockedAxios = vi.mocked(axios, true);
 
 // ─── getBannerUrl ─────────────────────────────────────────────────────────────
 
@@ -38,8 +42,6 @@ describe("getBannerUrl", () => {
   });
 
   it("URL-encodes special characters in username", () => {
-    // GitHub usernames are alphanumeric + hyphens only, but the function
-    // should still safely encode anything passed to it.
     const url = getBannerUrl({
       username: "user name",
       type: "stats",
@@ -105,73 +107,97 @@ describe("BannerApiError", () => {
 
 describe("validateUsername", () => {
   beforeEach(() => {
-    vi.stubGlobal("fetch", vi.fn());
+    vi.clearAllMocks();
   });
 
-  const mockFetch = (status: number, body = "") => {
-    vi.mocked(fetch).mockResolvedValueOnce(new Response(body, { status }));
+  const mockSuccess = () => {
+    mockedAxios.get.mockResolvedValueOnce({ data: "<svg/>", status: 200 });
+  };
+
+  const mockAxiosError = (status: number) => {
+    const err = Object.assign(new Error(`HTTP ${status}`), {
+      isAxiosError: true,
+      response: { status },
+    });
+    mockedAxios.get.mockRejectedValueOnce(err);
+    mockedAxios.isAxiosError.mockReturnValueOnce(true);
+    mockedAxios.isCancel.mockReturnValueOnce(false);
+  };
+
+  const mockNetworkError = () => {
+    const err = Object.assign(new Error("Network Error"), {
+      isAxiosError: true,
+      response: undefined,
+    });
+    mockedAxios.get.mockRejectedValueOnce(err);
+    mockedAxios.isAxiosError.mockReturnValueOnce(true);
+    mockedAxios.isCancel.mockReturnValueOnce(false);
+  };
+
+  const mockCancelError = () => {
+    const err = new Error("canceled");
+    mockedAxios.get.mockRejectedValueOnce(err);
+    mockedAxios.isCancel.mockReturnValueOnce(true);
   };
 
   it("returns null when the API responds with 200", async () => {
-    mockFetch(200);
+    mockSuccess();
     expect(await validateUsername("torvalds")).toBeNull();
   });
 
   it("returns an error message on 400", async () => {
-    mockFetch(400);
+    mockAxiosError(400);
     expect(await validateUsername("bad username")).toBe(
       "Invalid GitHub username.",
     );
   });
 
   it("returns an error message on 401", async () => {
-    mockFetch(401);
+    mockAxiosError(401);
     expect(await validateUsername("torvalds")).toBe(
       "API authentication error. Try again later.",
     );
   });
 
   it("returns a not-found message on 404", async () => {
-    mockFetch(404);
+    mockAxiosError(404);
     const result = await validateUsername("nobody");
     expect(result).toContain("nobody");
     expect(result).toContain("not found");
   });
 
   it("returns a rate-limit message on 429", async () => {
-    mockFetch(429);
+    mockAxiosError(429);
     expect(await validateUsername("torvalds")).toBe(
       "Too many requests. Please wait a moment.",
     );
   });
 
   it("returns a generic message on other errors", async () => {
-    mockFetch(502);
+    mockAxiosError(502);
     expect(await validateUsername("torvalds")).toBe(
       "Something went wrong. Please try again.",
     );
   });
 
-  it("returns null when the request is aborted", async () => {
-    vi.mocked(fetch).mockRejectedValueOnce(
-      Object.assign(new Error("Aborted"), { name: "AbortError" }),
-    );
+  it("returns null when the request is cancelled", async () => {
+    mockCancelError();
     const controller = new AbortController();
     expect(await validateUsername("torvalds", controller.signal)).toBeNull();
   });
 
-  it("returns a network error message on fetch failure", async () => {
-    vi.mocked(fetch).mockRejectedValueOnce(new Error("Network down"));
+  it("returns a network error message on no response", async () => {
+    mockNetworkError();
     expect(await validateUsername("torvalds")).toBe(
       "Network error. Check your connection.",
     );
   });
 
   it("calls the correct endpoint", async () => {
-    mockFetch(200);
+    mockSuccess();
     await validateUsername("octocat");
 
-    const calledUrl = vi.mocked(fetch).mock.calls[0][0] as string;
+    const calledUrl = mockedAxios.get.mock.calls[0][0] as string;
     expect(calledUrl).toContain("/banner/octocat");
   });
 });
@@ -180,7 +206,7 @@ describe("validateUsername", () => {
 
 describe("fetchBannerBlob", () => {
   beforeEach(() => {
-    vi.stubGlobal("fetch", vi.fn());
+    vi.clearAllMocks();
   });
 
   const params = {
@@ -191,49 +217,33 @@ describe("fetchBannerBlob", () => {
   };
 
   it("returns a Blob on a successful response", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce(
-      new Response("<svg/>", { status: 200 }),
-    );
+    const blob = new Blob(["<svg/>"], { type: "image/svg+xml" });
+    mockedAxios.get.mockResolvedValueOnce({ data: blob, status: 200 });
 
-    const blob = await fetchBannerBlob(params);
-    // jsdom's Blob lives in a different class realm than the global Node Blob,
-    // so toBeInstanceOf(Blob) fails across environments. Check the interface instead.
-    expect(blob.constructor.name).toBe("Blob");
-    expect(blob.size).toBeGreaterThan(0);
-    expect(typeof blob.text).toBe("function");
+    const result = await fetchBannerBlob(params);
+    expect(result.constructor.name).toBe("Blob");
+    expect(result.size).toBeGreaterThan(0);
+    expect(typeof result.text).toBe("function");
   });
 
-  it("throws BannerApiError on a non-OK response", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce(
-      new Response("user not found", { status: 404 }),
-    );
-
-    await expect(fetchBannerBlob(params)).rejects.toBeInstanceOf(
-      BannerApiError,
-    );
-  });
-
-  it("BannerApiError carries the HTTP status", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce(
-      new Response("gateway error", { status: 502 }),
-    );
-
-    try {
-      await fetchBannerBlob(params);
-    } catch (err) {
-      expect((err as BannerApiError).status).toBe(502);
-    }
-  });
-
-  it("passes the abort signal to fetch", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce(
-      new Response("<svg/>", { status: 200 }),
-    );
+  it("passes the abort signal to axios", async () => {
+    const blob = new Blob(["<svg/>"], { type: "image/svg+xml" });
+    mockedAxios.get.mockResolvedValueOnce({ data: blob, status: 200 });
 
     const controller = new AbortController();
     await fetchBannerBlob(params, controller.signal);
 
-    const options = vi.mocked(fetch).mock.calls[0][1] as RequestInit;
-    expect(options.signal).toBe(controller.signal);
+    const options = mockedAxios.get.mock.calls[0][1];
+    expect(options?.signal).toBe(controller.signal);
+  });
+
+  it("uses responseType blob", async () => {
+    const blob = new Blob(["<svg/>"], { type: "image/svg+xml" });
+    mockedAxios.get.mockResolvedValueOnce({ data: blob, status: 200 });
+
+    await fetchBannerBlob(params);
+
+    const options = mockedAxios.get.mock.calls[0][1];
+    expect(options?.responseType).toBe("blob");
   });
 });

@@ -27,6 +27,7 @@ import {
   applyPaletteToContribSvg,
   applyPaletteToStatsSvg,
 } from "../utils/svgColors";
+import axios from "axios";
 import { useState, useEffect, useRef, useCallback } from "react";
 
 // ─── SVG fetch + colour substitution ─────────────────────────────────────────
@@ -68,14 +69,14 @@ function useSvgBanner(
 
     const controller = new AbortController();
 
-    fetch(bannerUrl, { signal: controller.signal })
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.text();
+    axios
+      .get<string>(bannerUrl, {
+        responseType: "text",
+        signal: controller.signal,
       })
-      .then((text) => setRawSvg(text))
+      .then((res) => setRawSvg(res.data))
       .catch((err) => {
-        if (err.name !== "AbortError") setStatus("error");
+        if (!axios.isCancel(err)) setStatus("error");
       });
 
     return () => controller.abort();
@@ -135,7 +136,11 @@ interface HeaderProps {
   onChangeUsername: () => void;
 }
 
-const HeaderSection = ({ processedSvg, params, onChangeUsername }: HeaderProps) => {
+const HeaderSection = ({
+  processedSvg,
+  params,
+  onChangeUsername,
+}: HeaderProps) => {
   const { toggleSidebar } = useSidebar();
   const isMobile = useIsMobile();
   const { username } = useDashboard();
