@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://git-banner-v2.vercel.app/sitemap.xml
