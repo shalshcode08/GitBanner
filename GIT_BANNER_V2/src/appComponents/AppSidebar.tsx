@@ -1,4 +1,4 @@
-import { ArrowLeft, Linkedin, Moon, Sun, Twitter } from "lucide-react";
+import { ArrowLeft, Check, Copy, Link2, Linkedin, Moon, Sun, Twitter } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -23,6 +23,9 @@ import {
 } from "../utils/constants";
 import { cn } from "../lib/utils";
 import { useBanner } from "../hooks/useBanner";
+import { getBannerUrl } from "../api/banner";
+import { useState, useCallback } from "react";
+import { toast } from "sonner";
 
 // ─── Canvas Size ─────────────────────────────────────────────────────────────
 
@@ -159,6 +162,59 @@ const PaletteRow = ({
   );
 };
 
+// ─── Share Actions ────────────────────────────────────────────────────────────
+
+import type { BannerParams } from "../api/banner";
+
+const ShareActions = ({ params }: { params: BannerParams | null }) => {
+  const [copyMdState, setCopyMdState] = useState<"idle" | "copied">("idle");
+  const [copyLinkState, setCopyLinkState] = useState<"idle" | "copied">("idle");
+
+  const handleCopyMarkdown = useCallback(() => {
+    if (!params) return;
+    const url = getBannerUrl(params);
+    const markdown = `[![GitHub Banner](${url})](https://github.com/${params.username})`;
+    navigator.clipboard.writeText(markdown).then(() => {
+      setCopyMdState("copied");
+      toast.success("Markdown copied! Paste it in your GitHub README.");
+      setTimeout(() => setCopyMdState("idle"), 2000);
+    });
+  }, [params]);
+
+  const handleCopyLink = useCallback(() => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      setCopyLinkState("copied");
+      toast.success("Shareable link copied!");
+      setTimeout(() => setCopyLinkState("idle"), 2000);
+    });
+  }, []);
+
+  return (
+    <div className="flex gap-2 px-1 pb-1">
+      <button
+        onClick={handleCopyLink}
+        className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-md border text-xs font-medium transition-all cursor-pointer border-border text-muted-foreground hover:border-muted-foreground/40 hover:bg-muted/50 hover:text-foreground"
+      >
+        {copyLinkState === "copied" ? <Check size={13} /> : <Link2 size={13} />}
+        Copy Link
+      </button>
+      <button
+        onClick={handleCopyMarkdown}
+        disabled={!params}
+        className={cn(
+          "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-md border text-xs font-medium transition-all",
+          params
+            ? "cursor-pointer border-border text-muted-foreground hover:border-muted-foreground/40 hover:bg-muted/50 hover:text-foreground"
+            : "cursor-not-allowed border-border text-muted-foreground/40",
+        )}
+      >
+        {copyMdState === "copied" ? <Check size={13} /> : <Copy size={13} />}
+        Copy README
+      </button>
+    </div>
+  );
+};
+
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
 
 const AppSidebar = () => {
@@ -245,7 +301,10 @@ const AppSidebar = () => {
         )}
       </SidebarContent>
 
-      <SidebarFooter />
+      <SidebarFooter>
+        <SidebarSeparator className="mb-2" />
+        <ShareActions params={params} />
+      </SidebarFooter>
     </Sidebar>
   );
 };

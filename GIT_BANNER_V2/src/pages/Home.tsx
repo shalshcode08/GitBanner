@@ -8,9 +8,19 @@ const Home = () => {
   const { theme } = useTheme();
 
   return (
-    <div className="w-full min-h-screen flex flex-col bg-background">
-      {/* Sticky header */}
-      <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
+    <div className="w-full min-h-screen flex flex-col bg-background relative">
+      {/* Subtle radial gradient — green glow anchored behind the hero */}
+      <div
+        className="pointer-events-none fixed inset-x-0 top-0 h-[520px] z-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 40% at 50% 10%, var(--color-primary) 0%, transparent 70%)",
+          opacity: 0.06,
+        }}
+      />
+
+      {/* Sticky glass header */}
+      <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-md backdrop-saturate-150">
         <div className="max-w-3xl mx-auto px-4 py-3">
           <HomepageHeader />
         </div>
