@@ -1,7 +1,11 @@
 import { useMemo } from "react";
 import { useSearchParams } from "react-router";
 import { useDashboard } from "../context/DashboardContext";
-import { getBannerUrl, type ApiBannerType, type BannerParams } from "../api/banner";
+import {
+  getBannerUrl,
+  type ApiBannerType,
+  type BannerParams,
+} from "../api/banner";
 import { CardsType } from "../types/cards";
 
 // Maps the ?type= URL param (set by the home page cards) to the backend API type.

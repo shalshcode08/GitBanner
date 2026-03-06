@@ -93,9 +93,7 @@ const UserNameInputModal = ({ open, setOpen }: Props) => {
             disabled={isValidating}
             autoComplete="off"
           />
-          {error && (
-            <p className="text-xs text-destructive -mt-2">{error}</p>
-          )}
+          {error && <p className="text-xs text-destructive -mt-2">{error}</p>}
         </div>
 
         <p className="flex flex-wrap items-center gap-x-1 text-sm text-muted-foreground">

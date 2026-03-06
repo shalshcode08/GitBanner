@@ -1,8 +1,15 @@
 import { describe, it, expect } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { DashboardProvider, useDashboard } from "../../context/DashboardContext";
-import { BANNER_SIZES, COLOR_PALETTES, APP_USERNAME_KEY } from "../../utils/constants";
+import {
+  DashboardProvider,
+  useDashboard,
+} from "../../context/DashboardContext";
+import {
+  BANNER_SIZES,
+  COLOR_PALETTES,
+  APP_USERNAME_KEY,
+} from "../../utils/constants";
 import { storage } from "../../utils/localStorage";
 
 const wrapper = ({ children }: { children: ReactNode }) => (

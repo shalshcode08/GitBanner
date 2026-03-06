@@ -22,6 +22,7 @@ import {
   type ColorPalette,
 } from "../utils/constants";
 import { cn } from "../lib/utils";
+import { useBanner } from "../hooks/useBanner";
 
 // ─── Canvas Size ─────────────────────────────────────────────────────────────
 
@@ -171,6 +172,8 @@ const AppSidebar = () => {
     bannerTheme,
     setBannerTheme,
   } = useDashboard();
+  const { params } = useBanner();
+  const isPinned = params?.type === "pinned";
 
   return (
     <Sidebar variant="floating" side="left" className="py-2 pl-4">
@@ -218,24 +221,28 @@ const AppSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarSeparator />
+        {!isPinned && (
+          <>
+            <SidebarSeparator />
 
-        {/* Contribution Colors */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Contribution Colors</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <div className="flex flex-col gap-0.5 px-1 pt-1">
-              {COLOR_PALETTES.map((palette) => (
-                <PaletteRow
-                  key={palette.id}
-                  palette={palette}
-                  selected={colorPalette.id === palette.id}
-                  onClick={() => setColorPalette(palette)}
-                />
-              ))}
-            </div>
-          </SidebarGroupContent>
-        </SidebarGroup>
+            {/* Contribution Colors */}
+            <SidebarGroup>
+              <SidebarGroupLabel>Contribution Colors</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <div className="flex flex-col gap-0.5 px-1 pt-1">
+                  {COLOR_PALETTES.map((palette) => (
+                    <PaletteRow
+                      key={palette.id}
+                      palette={palette}
+                      selected={colorPalette.id === palette.id}
+                      onClick={() => setColorPalette(palette)}
+                    />
+                  ))}
+                </div>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </>
+        )}
       </SidebarContent>
 
       <SidebarFooter />

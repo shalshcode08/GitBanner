@@ -49,9 +49,7 @@ describe("useBanner", () => {
     seedUsername("torvalds");
 
     const { result } = renderHook(() => useBanner(), {
-      wrapper: makeWrapper(
-        `/edit?type=${CardsType.GIT_CONTRIBUTION_CARD}`,
-      ),
+      wrapper: makeWrapper(`/edit?type=${CardsType.GIT_CONTRIBUTION_CARD}`),
     });
 
     expect(result.current.bannerUrl).toContain("type=contributions");
@@ -62,9 +60,7 @@ describe("useBanner", () => {
     seedUsername("torvalds");
 
     const { result } = renderHook(() => useBanner(), {
-      wrapper: makeWrapper(
-        `/edit?type=${CardsType.GIT_PINNED_REPOS_CARD}`,
-      ),
+      wrapper: makeWrapper(`/edit?type=${CardsType.GIT_PINNED_REPOS_CARD}`),
     });
 
     expect(result.current.bannerUrl).toContain("type=pinned");

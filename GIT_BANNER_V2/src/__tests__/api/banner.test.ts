@@ -109,9 +109,7 @@ describe("validateUsername", () => {
   });
 
   const mockFetch = (status: number, body = "") => {
-    vi.mocked(fetch).mockResolvedValueOnce(
-      new Response(body, { status }),
-    );
+    vi.mocked(fetch).mockResolvedValueOnce(new Response(body, { status }));
   };
 
   it("returns null when the API responds with 200", async () => {
@@ -210,7 +208,9 @@ describe("fetchBannerBlob", () => {
       new Response("user not found", { status: 404 }),
     );
 
-    await expect(fetchBannerBlob(params)).rejects.toBeInstanceOf(BannerApiError);
+    await expect(fetchBannerBlob(params)).rejects.toBeInstanceOf(
+      BannerApiError,
+    );
   });
 
   it("BannerApiError carries the HTTP status", async () => {

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { storage } from "../../utils/localStorage";
 
 // jsdom provides localStorage; setup.ts clears it before each test.

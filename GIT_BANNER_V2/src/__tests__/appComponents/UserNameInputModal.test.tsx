@@ -22,8 +22,7 @@ vi.mock("react-router", async (importOriginal) => {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const mockValidate = () =>
-  vi.mocked(bannerApi.validateUsername);
+const mockValidate = () => vi.mocked(bannerApi.validateUsername);
 
 function renderModal(open = true, setOpen = vi.fn()) {
   const Wrapper = ({ children }: { children: ReactNode }) => (
@@ -54,16 +53,12 @@ describe("UserNameInputModal", () => {
 
   it("renders the username input", () => {
     renderModal();
-    expect(
-      screen.getByPlaceholderText("GitHub username"),
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("GitHub username")).toBeInTheDocument();
   });
 
   it("submit button is disabled when the input is empty", () => {
     renderModal();
-    expect(
-      screen.getByRole("button", { name: /continue/i }),
-    ).toBeDisabled();
+    expect(screen.getByRole("button", { name: /continue/i })).toBeDisabled();
   });
 
   it("submit button becomes enabled once the user types", async () => {
@@ -72,9 +67,7 @@ describe("UserNameInputModal", () => {
 
     await user.type(screen.getByPlaceholderText("GitHub username"), "a");
 
-    expect(
-      screen.getByRole("button", { name: /continue/i }),
-    ).toBeEnabled();
+    expect(screen.getByRole("button", { name: /continue/i })).toBeEnabled();
   });
 
   it("calls validateUsername with the trimmed input on submit", async () => {
@@ -149,9 +142,7 @@ describe("UserNameInputModal", () => {
     await user.click(screen.getByRole("button", { name: /continue/i }));
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Invalid GitHub username."),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Invalid GitHub username.")).toBeInTheDocument();
     });
 
     await user.type(input, "x");
@@ -198,14 +189,12 @@ describe("UserNameInputModal", () => {
     await user.type(screen.getByPlaceholderText("GitHub username"), "torvalds");
     await user.click(screen.getByRole("button", { name: /continue/i }));
 
-    expect(
-      screen.getByPlaceholderText("GitHub username"),
-    ).toBeDisabled();
-    expect(
-      screen.getByRole("button", { name: /cancel/i }),
-    ).toBeDisabled();
+    expect(screen.getByPlaceholderText("GitHub username")).toBeDisabled();
+    expect(screen.getByRole("button", { name: /cancel/i })).toBeDisabled();
 
     // Resolve the promise inside act() so the resulting state update is flushed cleanly.
-    await act(async () => { resolve(null); });
+    await act(async () => {
+      resolve(null);
+    });
   });
 });

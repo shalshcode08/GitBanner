@@ -34,7 +34,8 @@ export const COLOR_PALETTES: ColorPalette[] = [
   {
     id: "default",
     label: "Default",
-    colors: ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"],
+    // Matches backend dark-theme hardcoded colors exactly — no substitution applied.
+    colors: ["#21262d", "#0e4429", "#006d32", "#26a641", "#39d353"],
   },
   {
     id: "red",

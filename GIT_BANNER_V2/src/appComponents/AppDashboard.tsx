@@ -1,6 +1,12 @@
 import ThemeToggleBtn from "../appComponents/ThemeToggle";
 import { CreateBtn } from "../utils/createCustomAppBtn";
-import { Download, Github, LoaderCircle, SidebarIcon, TriangleAlert } from "lucide-react";
+import {
+  Download,
+  Github,
+  LoaderCircle,
+  SidebarIcon,
+  TriangleAlert,
+} from "lucide-react";
 import { Button } from "../components/ui/button";
 import { useSidebar } from "../components/ui/sidebar";
 import UserNameInputModal from "./UserNameInputModal";
@@ -13,36 +19,142 @@ import {
 import { cn } from "../lib/utils";
 import { useDashboard } from "../context/DashboardContext";
 import { useBanner } from "../hooks/useBanner";
-import { fetchBannerBlob } from "../api/banner";
-import { useState, useCallback } from "react";
+import type { BannerParams } from "../api/banner";
+import type { ColorPalette } from "../utils/constants";
+import type { BannerTheme } from "../context/DashboardContext";
+import {
+  applyPaletteToContribSvg,
+  applyPaletteToStatsSvg,
+} from "../utils/svgColors";
+import { useState, useEffect, useRef, useCallback } from "react";
+
+// ─── SVG fetch + colour substitution ─────────────────────────────────────────
+
+type SvgStatus = "idle" | "loading" | "loaded" | "error";
+
+/**
+ * Fetches the banner SVG as text, applies the colour palette substitution,
+ * and returns a blob object URL ready for <img src>.
+ *
+ * Palette swaps are instant — they only re-process the cached SVG text without
+ * triggering a new network request.  The browser HTTP cache still works because
+ * we fetch via the normal fetch() API and the backend sends Cache-Control headers.
+ */
+function useSvgBanner(
+  bannerUrl: string | null,
+  bannerType: string | null,
+  colorPalette: ColorPalette,
+  bannerTheme: BannerTheme,
+) {
+  const [rawSvg, setRawSvg] = useState<string | null>(null);
+  const [processedSvg, setProcessedSvg] = useState<string | null>(null);
+  const [objectUrl, setObjectUrl] = useState<string | null>(null);
+  const [status, setStatus] = useState<SvgStatus>("idle");
+  const prevObjectUrlRef = useRef<string | null>(null);
+
+  // Re-fetch whenever the banner URL changes (username / type / format / theme).
+  useEffect(() => {
+    if (!bannerUrl) {
+      setRawSvg(null);
+      setProcessedSvg(null);
+      setObjectUrl(null);
+      setStatus("idle");
+      return;
+    }
+
+    setStatus("loading");
+    setRawSvg(null);
+
+    const controller = new AbortController();
+
+    fetch(bannerUrl, { signal: controller.signal })
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.text();
+      })
+      .then((text) => setRawSvg(text))
+      .catch((err) => {
+        if (err.name !== "AbortError") setStatus("error");
+      });
+
+    return () => controller.abort();
+  }, [bannerUrl]);
+
+  // Re-apply colours whenever the raw SVG or palette changes — no network call.
+  useEffect(() => {
+    if (!rawSvg) return;
+
+    const isNonDefault = colorPalette.id !== "default";
+    let svg = rawSvg;
+
+    if (isNonDefault) {
+      if (bannerType === "contributions") {
+        svg = applyPaletteToContribSvg(
+          rawSvg,
+          colorPalette.colors,
+          bannerTheme,
+        );
+      } else if (bannerType === "stats") {
+        svg = applyPaletteToStatsSvg(rawSvg, colorPalette.colors, bannerTheme);
+      }
+      // pinned: no colour substitution
+    }
+
+    setProcessedSvg(svg);
+
+    // Revoke the previous blob URL to free memory before creating a new one.
+    if (prevObjectUrlRef.current) {
+      URL.revokeObjectURL(prevObjectUrlRef.current);
+    }
+    const newUrl = URL.createObjectURL(
+      new Blob([svg], { type: "image/svg+xml" }),
+    );
+    prevObjectUrlRef.current = newUrl;
+    setObjectUrl(newUrl);
+    setStatus("loaded");
+  }, [rawSvg, colorPalette, bannerType, bannerTheme]);
+
+  // Revoke on unmount.
+  useEffect(() => {
+    return () => {
+      if (prevObjectUrlRef.current) {
+        URL.revokeObjectURL(prevObjectUrlRef.current);
+      }
+    };
+  }, []);
+
+  return { objectUrl, processedSvg, status };
+}
 
 // ─── Header ───────────────────────────────────────────────────────────────────
 
-const HeaderSection = () => {
+interface HeaderProps {
+  processedSvg: string | null;
+  params: BannerParams | null;
+}
+
+const HeaderSection = ({ processedSvg, params }: HeaderProps) => {
   const { toggleSidebar } = useSidebar();
   const isMobile = useIsMobile();
   const { username } = useDashboard();
-  const { params } = useBanner();
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const handleDownload = useCallback(async () => {
-    if (!params || isDownloading) return;
+  const handleDownload = useCallback(() => {
+    if (!processedSvg || !params || isDownloading) return;
 
     setIsDownloading(true);
     try {
-      const blob = await fetchBannerBlob(params);
-      const objectUrl = URL.createObjectURL(blob);
+      const blob = new Blob([processedSvg], { type: "image/svg+xml" });
+      const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = objectUrl;
+      a.href = url;
       a.download = `${params.username}-${params.type}-${params.format}.svg`;
       a.click();
-      URL.revokeObjectURL(objectUrl);
-    } catch {
-      // silently ignore — banner may not be loaded yet
+      URL.revokeObjectURL(url);
     } finally {
       setIsDownloading(false);
     }
-  }, [params, isDownloading]);
+  }, [processedSvg, params, isDownloading]);
 
   return (
     <div className="px-4 flex items-center gap-4 justify-between w-full">
@@ -67,7 +179,7 @@ const HeaderSection = () => {
         <Button
           className="h-full py-3 bg-primary text-primary-foreground text-xs font-medium rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2 hover:cursor-pointer disabled:opacity-50"
           onClick={handleDownload}
-          disabled={!params || isDownloading}
+          disabled={!processedSvg || isDownloading}
         >
           {isDownloading ? (
             <LoaderCircle size={16} className="animate-spin" />
@@ -83,12 +195,17 @@ const HeaderSection = () => {
 
 // ─── Main canvas ──────────────────────────────────────────────────────────────
 
-type ImgStatus = "loading" | "loaded" | "error";
+interface MainContentProps {
+  objectUrl: string | null;
+  status: SvgStatus;
+  hasUrl: boolean;
+}
 
-const MainContentSection = () => {
-  const { bannerUrl } = useBanner();
-  const [imgStatus, setImgStatus] = useState<ImgStatus>("loading");
-
+const MainContentSection = ({
+  objectUrl,
+  status,
+  hasUrl,
+}: MainContentProps) => {
   return (
     <div className="relative flex-1 min-h-0 w-full bg-background overflow-hidden">
       {/* Grid background */}
@@ -102,21 +219,24 @@ const MainContentSection = () => {
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-background [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
 
       <div className="relative z-20 p-4 flex items-center justify-center w-full h-full">
-        {!bannerUrl ? (
+        {!hasUrl ? (
           <p className="text-sm text-muted-foreground">
             Enter a GitHub username to generate your banner.
           </p>
         ) : (
           <div className="w-full max-w-4xl">
-            {/* Skeleton shown while image loads */}
-            {imgStatus === "loading" && (
+            {/* Skeleton */}
+            {status === "loading" && (
               <div className="w-full aspect-[1500/500] rounded-xl bg-muted animate-pulse flex items-center justify-center">
-                <LoaderCircle size={28} className="animate-spin text-muted-foreground" />
+                <LoaderCircle
+                  size={28}
+                  className="animate-spin text-muted-foreground"
+                />
               </div>
             )}
 
-            {/* Error state */}
-            {imgStatus === "error" && (
+            {/* Error */}
+            {status === "error" && (
               <div className="w-full aspect-[1500/500] rounded-xl border border-destructive/30 bg-destructive/5 flex flex-col items-center justify-center gap-2">
                 <TriangleAlert size={22} className="text-destructive" />
                 <p className="text-sm text-destructive">
@@ -125,18 +245,15 @@ const MainContentSection = () => {
               </div>
             )}
 
-            {/* Banner — always rendered so browser caches; hidden until loaded */}
-            <img
-              key={bannerUrl}
-              src={bannerUrl}
-              alt="GitHub banner preview"
-              className={cn(
-                "w-full rounded-xl shadow-lg",
-                imgStatus === "loaded" ? "block" : "hidden",
-              )}
-              onLoad={() => setImgStatus("loaded")}
-              onError={() => setImgStatus("error")}
-            />
+            {/* Banner — blob URL with colour palette already baked in */}
+            {objectUrl && (
+              <img
+                key={objectUrl}
+                src={objectUrl}
+                alt="GitHub banner preview"
+                className="w-full rounded-xl shadow-lg"
+              />
+            )}
           </div>
         )}
       </div>
@@ -152,10 +269,24 @@ interface Props {
 }
 
 const AppDashboard = ({ openDialoge, setOpenDialoge }: Props) => {
+  const { bannerUrl, params } = useBanner();
+  const { colorPalette, bannerTheme } = useDashboard();
+
+  const { objectUrl, processedSvg, status } = useSvgBanner(
+    bannerUrl,
+    params?.type ?? null,
+    colorPalette,
+    bannerTheme,
+  );
+
   return (
     <div className="flex flex-col h-full w-full">
-      <HeaderSection />
-      <MainContentSection />
+      <HeaderSection processedSvg={processedSvg} params={params} />
+      <MainContentSection
+        objectUrl={objectUrl}
+        status={status}
+        hasUrl={!!bannerUrl}
+      />
       <UserNameInputModal open={openDialoge} setOpen={setOpenDialoge} />
     </div>
   );
