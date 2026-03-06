@@ -2,25 +2,56 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0d1117" />
+    <meta name="robots" content="index, follow" />
+
     <title>GitBanner — GitHub Profile Banners for Twitter & LinkedIn</title>
     <meta
       name="description"
-      content="Generate beautiful GitHub profile banners — contribution graphs, stats, and pinned repos — ready for Twitter/X and LinkedIn."
+      content="Generate beautiful GitHub profile banners — contribution graphs, stats, and pinned repos — sized for Twitter/X and LinkedIn. Free, instant, no sign-up."
     />
-    <meta property="og:title" content="GitBanner" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="GitBanner — GitHub Profile Banners" />
     <meta
       property="og:description"
-      content="Generate beautiful GitHub profile banners for Twitter/X and LinkedIn."
+      content="Generate beautiful GitHub profile banners — contribution graphs, stats, and pinned repos — sized for Twitter/X and LinkedIn. Free, instant, no sign-up."
     />
-    <meta property="og:type" content="website" />
+    <!-- Replace with your deployed URL after first deploy -->
+    <!-- <meta property="og:url" content="https://your-domain.com" /> -->
+    <!-- <meta property="og:image" content="https://your-domain.com/og-image.png" /> -->
+
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="GitBanner" />
+    <meta name="twitter:title" content="GitBanner — GitHub Profile Banners" />
     <meta
       name="twitter:description"
-      content="Generate beautiful GitHub profile banners for Twitter/X and LinkedIn."
+      content="Generate beautiful GitHub profile banners for Twitter/X and LinkedIn. Free, instant, no sign-up."
     />
+    <!-- <meta name="twitter:image" content="https://your-domain.com/og-image.png" /> -->
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "GitBanner",
+        "description": "Generate GitHub profile banners — contribution graphs, stats, and pinned repos — sized for Twitter/X and LinkedIn.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "All",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    </script>
     <script>
       (function () {
         const savedTheme = localStorage.getItem("theme");
