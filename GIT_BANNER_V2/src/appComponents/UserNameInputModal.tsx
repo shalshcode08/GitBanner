@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "../components/ui/button";
 import {
   Dialog,
@@ -10,9 +10,9 @@ import {
 import { Input } from "../components/ui/input";
 import { useNavigate } from "react-router";
 import { AppRoutes } from "../routes";
-import { LightbulbIcon } from "lucide-react";
-import { storage } from "../utils/localStorage";
-import { APP_USERNAME_KEY } from "../utils/constants";
+import { LightbulbIcon, LoaderCircle } from "lucide-react";
+import { validateUsername } from "../api/banner";
+import { useDashboard } from "../context/DashboardContext";
 
 interface Props {
   open: boolean;
@@ -21,20 +21,45 @@ interface Props {
 
 const UserNameInputModal = ({ open, setOpen }: Props) => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState<string>("");
+  const { username: savedUsername, setUsername } = useDashboard();
+  const [input, setInput] = useState<string>(savedUsername);
+  const [error, setError] = useState<string | null>(null);
+  const [isValidating, setIsValidating] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
 
-  const handleCancleBtnClick = () => {
+  useEffect(() => {
+    setInput(savedUsername);
+    setError(null);
+  }, [open, savedUsername]);
+
+  const handleCancel = () => {
+    abortRef.current?.abort();
     setOpen(false);
     navigate(AppRoutes.Home);
   };
 
-  const handleSubmit = () => {
-    if (username.trim()) {
-      // TODO: Handle username submission (e.g., save to context or fetch data)
-      storage.set(APP_USERNAME_KEY, username);
-      console.log("Username:", username);
-      setOpen(false);
+  const handleSubmit = async () => {
+    const trimmed = input.trim();
+    if (!trimmed) return;
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    setError(null);
+    setIsValidating(true);
+
+    const err = await validateUsername(trimmed, controller.signal);
+
+    setIsValidating(false);
+
+    if (err) {
+      setError(err);
+      return;
     }
+
+    setUsername(trimmed);
+    setOpen(false);
   };
 
   return (
@@ -56,13 +81,21 @@ const UserNameInputModal = ({ open, setOpen }: Props) => {
           <Input
             id="username"
             placeholder="GitHub username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={input}
+            onChange={(e) => {
+              setInput(e.target.value);
+              setError(null);
+            }}
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSubmit();
             }}
-            className="py-5"
+            className={`py-5 ${error ? "border-destructive focus-visible:ring-destructive" : ""}`}
+            disabled={isValidating}
+            autoComplete="off"
           />
+          {error && (
+            <p className="text-xs text-destructive -mt-2">{error}</p>
+          )}
         </div>
 
         <p className="flex flex-wrap items-center gap-x-1 text-sm text-muted-foreground">
@@ -76,8 +109,9 @@ const UserNameInputModal = ({ open, setOpen }: Props) => {
         <div className="flex flex-col gap-3">
           <Button
             type="button"
-            variant={"secondary"}
-            onClick={handleCancleBtnClick}
+            variant="secondary"
+            onClick={handleCancel}
+            disabled={isValidating}
             className="hover:cursor-pointer py-5"
           >
             Cancel
@@ -85,10 +119,14 @@ const UserNameInputModal = ({ open, setOpen }: Props) => {
           <Button
             type="submit"
             onClick={handleSubmit}
-            disabled={!username.trim()}
+            disabled={!input.trim() || isValidating}
             className="hover:cursor-pointer py-5"
           >
-            Continue
+            {isValidating ? (
+              <LoaderCircle size={15} className="animate-spin" />
+            ) : (
+              "Continue"
+            )}
           </Button>
         </div>
       </DialogContent>

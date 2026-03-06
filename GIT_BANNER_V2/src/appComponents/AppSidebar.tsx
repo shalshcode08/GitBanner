@@ -1,4 +1,4 @@
-import { ArrowLeft, Linkedin, Twitter } from "lucide-react";
+import { ArrowLeft, Linkedin, Moon, Sun, Twitter } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -14,7 +14,7 @@ import { AppRoutes } from "../routes";
 import { AppLogo } from "../icons/HeaderIcons";
 import { useTheme } from "../context/ThemeProvider";
 import { Link } from "react-router";
-import { useDashboard } from "../context/DashboardContext";
+import { useDashboard, type BannerTheme } from "../context/DashboardContext";
 import {
   BANNER_SIZES,
   COLOR_PALETTES,
@@ -81,7 +81,42 @@ const AspectRatioCard = ({
   );
 };
 
-// ─── Color Palette ────────────────────────────────────────────────────────────
+// ─── Banner Theme ─────────────────────────────────────────────────────────────
+
+const BannerThemeToggle = ({
+  value,
+  onChange,
+}: {
+  value: BannerTheme;
+  onChange: (theme: BannerTheme) => void;
+}) => {
+  const options: { label: string; value: BannerTheme; Icon: typeof Sun }[] = [
+    { label: "Dark", value: "dark", Icon: Moon },
+    { label: "Light", value: "light", Icon: Sun },
+  ];
+
+  return (
+    <div className="flex gap-2 px-1 pt-1">
+      {options.map(({ label, value: optVal, Icon }) => (
+        <button
+          key={optVal}
+          onClick={() => onChange(optVal)}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-md border text-xs font-medium transition-all cursor-pointer",
+            value === optVal
+              ? "border-primary bg-primary/5 text-primary"
+              : "border-border hover:border-muted-foreground/40 hover:bg-muted/50 text-muted-foreground",
+          )}
+        >
+          <Icon size={13} />
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+};
+
+// ─── Contribution Colors ──────────────────────────────────────────────────────
 
 const PaletteRow = ({
   palette,
@@ -128,8 +163,14 @@ const PaletteRow = ({
 const AppSidebar = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
-  const { bannerSize, setBannerSize, colorPalette, setColorPalette } =
-    useDashboard();
+  const {
+    bannerSize,
+    setBannerSize,
+    colorPalette,
+    setColorPalette,
+    bannerTheme,
+    setBannerTheme,
+  } = useDashboard();
 
   return (
     <Sidebar variant="floating" side="left" className="py-2 pl-4">
@@ -169,9 +210,19 @@ const AppSidebar = () => {
 
         <SidebarSeparator />
 
-        {/* Color Palette */}
+        {/* Banner Theme */}
         <SidebarGroup>
-          <SidebarGroupLabel>Color Palette</SidebarGroupLabel>
+          <SidebarGroupLabel>Banner Theme</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <BannerThemeToggle value={bannerTheme} onChange={setBannerTheme} />
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarSeparator />
+
+        {/* Contribution Colors */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Contribution Colors</SidebarGroupLabel>
           <SidebarGroupContent>
             <div className="flex flex-col gap-0.5 px-1 pt-1">
               {COLOR_PALETTES.map((palette) => (
